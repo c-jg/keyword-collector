@@ -45,9 +45,9 @@ def upload_long(keyword, wav, resampled):
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(destination)
 
-    blob.upload_from_filename(wav)
+    blob.upload_from_filename("data/" + wav)
 
-    os.remove(wav)
+    os.remove("data/" + wav)
 
 
 def count_files(keyword):

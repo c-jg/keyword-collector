@@ -1,6 +1,8 @@
-gcp_creds/
-venv/
-env
-.DS_Store
-*/__pycache__
-models/
+TODO
+__pycache__
+data
+gcp_creds
+models
+records
+venv
+

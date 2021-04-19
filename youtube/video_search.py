@@ -53,7 +53,7 @@ class SearchQuery:
 
 		search_results = self.results["URL"]
 
-		search_results_records = f"records/{self.query}_searched.txt"
+		search_results_records = f"/home/g1_connor_guerrero/keyword-collector/records/{self.query}_searched.txt"
 		searched = open(search_results_records, 'a')
 		for video_id in search_results:
 			searched.write(video_id + "\n")

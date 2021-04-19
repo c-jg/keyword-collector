@@ -31,13 +31,13 @@ def get_keywords_loop(keyword):
                 og_wav = download_audio(video_id=video_id)
                 print("Downloaded audio.")
 
+                # resample
+                resampled = resample_audio(og_wav, keyword)
+                print("Resampled")
+
                 # upload original audio to GCP bkt 
                 gcp_bkt.upload_long(keyword=keyword, wav=og_wav, resampled=False)
                 print("Uploaded original audio.")
-
-                # resample 
-                resampled = resample_audio(og_wav, keyword)
-                print("Resampled.")
 
                 # extract keywords
                 num_saved = extract(conv_audio=resampled, keyword=keyword)
