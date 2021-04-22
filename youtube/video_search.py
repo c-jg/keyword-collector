@@ -5,7 +5,8 @@ import googleapiclient.errors
 
 
 class SearchQuery:
-	def __init__(self, query):
+	def __init__(self, keyword, query):
+		self.keyword = keyword 
 		self.query = query
 		self.youtube = self.build_yt() 
 		self.results = {
@@ -35,7 +36,8 @@ class SearchQuery:
 			q=self.query,
 			maxResults=50,
 			safeSearch="none",
-			type="video"
+			type="video",
+			pageToken=page_token
 		)
 		response = request.execute()
 
@@ -53,7 +55,7 @@ class SearchQuery:
 
 		search_results = self.results["URL"]
 
-		search_results_records = f"/home/g1_connor_guerrero/keyword-collector/records/{self.query}_searched.txt"
+		search_results_records = os.path.join(os.getcwd(), f"records/{self.keyword}_searched.txt")
 		searched = open(search_results_records, 'a')
 		for video_id in search_results:
 			searched.write(video_id + "\n")

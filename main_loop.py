@@ -3,6 +3,7 @@ from resample import resample_audio
 
 from youtube.video_dl import download_audio
 from youtube.video_search import SearchQuery
+import find_ids
 import gcp_db
 import gcp_bkt
 
@@ -13,14 +14,25 @@ from tqdm import tqdm
 
 
 def get_keywords_loop(keyword):
-    search_query = SearchQuery(query=keyword)
-    search_results = search_query.search() # list of video id's
+    # check for existing search results
+    search_results = find_ids.check_records(keyword=keyword)
+
+    if len(search_results) == 0:
+        search_query = SearchQuery(query=keyword)
+        search_results = search_query.search() # list of video id's
 
     total_ext = 0
     total_saved = 0
 
+    # list of videos in DB
+    extracted = gcp_db.list_records(table=keyword, column="VIDEO_ID")
+
     # download and extract each video in search results 
     for video_id in tqdm(search_results):
+        # skip if video has already been analyzed 
+        if video_id in extracted:
+            continue 
+
         # count number of utterances collected in GCP bucket 
         total_files = gcp_bkt.count_files(keyword)
         print(f"Total utterances: {total_files}")
@@ -46,7 +58,7 @@ def get_keywords_loop(keyword):
                 gcp_bkt.upload_long(keyword=keyword, wav=resampled, resampled=True)
 
                 # add video IDs to GCP PSQL DB
-                gcp_db.store_record(keyword=keyword, video_id=video_id, count=num_saved)
+                gcp_db.store_record(table=keyword, video_id=video_id, count=num_saved)
                 
                 total_ext += 1
                 total_saved += num_saved
