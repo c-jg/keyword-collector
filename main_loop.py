@@ -13,12 +13,15 @@ import sys
 from tqdm import tqdm
 
 
-def get_keywords_loop(keyword):
+def get_keywords_loop(keyword, query):
     # check for existing search results
     search_results = find_ids.check_records(keyword=keyword)
 
     if len(search_results) == 0:
-        search_query = SearchQuery(query=keyword)
+        if query is None:
+            query = keyword 
+
+        search_query = SearchQuery(keyword=keyword, query=query)
         search_results = search_query.search() # list of video id's
 
     total_ext = 0
@@ -79,10 +82,17 @@ if __name__ == "__main__":
         type=str,
         help='Keyword to collect'
     )
+
+    parser.add_argument(
+        '--query',
+        type=str,
+        help='Query to search on YouTube'
+    )
     
     FLAGS, _ = parser.parse_known_args()
-    
-    if len(sys.argv) > 1:
-        get_keywords_loop(keyword=FLAGS.keyword)
+
+    if FLAGS.keyword is not None:
+        get_keywords_loop(keyword=FLAGS.keyword, query=FLAGS.query)
     else:
         print("No keyword entered.")
+
