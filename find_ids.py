@@ -1,6 +1,6 @@
 import psycopg2
 import os 
-import gcp_db
+from gcp import gcp_db
 
 
 def check_records(keyword):

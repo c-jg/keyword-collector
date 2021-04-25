@@ -2,7 +2,7 @@ from deepspeech import Model
 
 import soundfile as sf
 import numpy as np
-import gcp_bkt
+from gcp import gcp_bkt
 
 import os 
 import wave

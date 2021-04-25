@@ -4,8 +4,7 @@ from resample import resample_audio, resample_local
 from youtube.video_dl import download_audio
 from youtube.video_search import SearchQuery
 import find_ids
-import gcp_db
-import gcp_bkt
+from gcp import gcp_db, gcp_bkt
 
 import argparse
 import os 
