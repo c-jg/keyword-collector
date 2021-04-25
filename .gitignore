@@ -6,3 +6,5 @@ models
 records
 venv
 env
+test_audio_data
+.DS_Store

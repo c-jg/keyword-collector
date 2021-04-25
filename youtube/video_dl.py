@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import youtube_dl
+import os 
 
 
 class MyLogger(object):
@@ -35,4 +36,4 @@ def download_audio(video_id):
         title = info_dict.get("title", None)
         ydl.download([video])
     
-    return f"vid_{id_}.wav"
+    return os.path.join(SAVE_PATH, f"vid_{id_}.wav")

@@ -63,12 +63,10 @@ def extract_keywords(metadata):
     return transcript
 
 
-def save_keywords(transcript, keyword, audio):
+def save_keywords(transcript, keyword, audio, auth):
     ''' Save utterances in individual .wav files '''
 
-    kw_dir = f"data/{keyword}"
-    if not os.path.exists(kw_dir):
-        os.makedirs(kw_dir)
+    kw_dir = os.path.join("data", keyword)
     
     sample_rate = 16000
 
@@ -89,12 +87,13 @@ def save_keywords(transcript, keyword, audio):
             out_file_path = os.path.join(kw_dir, save_file)
             sf.write(out_file_path, audio[start:end], sample_rate)
 
-            # upload to google storage bucket
-            gcp_bkt.upload_clip(keyword=keyword, wav=out_file_path)
-
+            if auth is True:
+                # upload to google storage bucket
+                gcp_bkt.upload_clip(keyword=keyword, wav=out_file_path)
+            
             saved += 1
 
-    return saved 
+    return saved
 
 
 def inspect_keywords(transcript):
@@ -115,10 +114,17 @@ def inspect_keywords(transcript):
     return sorted_counts
 
 
-def extract(conv_audio, keyword):
+def extract(conv_audio, keyword, auth):
+    '''
+    Extracts keywords from audio file,
+
+    conv_audio: Path to resampled audio file 
+    keyword:    Desired keyword to collect
+    auth:       True if saving to GCP cloud storage bucket 
+    '''
     print(f"Extracting '{keyword}' utterances from {conv_audio}.")
     # time series, number of samples, sampling rate 
-    audio, buffer, rate = read_wav_file("data/" + conv_audio)
+    audio, buffer, rate = read_wav_file(conv_audio)
 
     # tokens 
     transcribed_metadata = transcribe_batch(audio=audio)
@@ -126,9 +132,10 @@ def extract(conv_audio, keyword):
     # list of words with start, end times 
     transcript = extract_keywords(transcribed_metadata)
 
-    num_saved = save_keywords(transcript=transcript, keyword=keyword, audio=audio)
+    num_saved = save_keywords(transcript=transcript, keyword=keyword, 
+                            audio=audio, auth=auth)
 
     print(f"Utterances saved: {num_saved}")
 
-    return num_saved
+    return num_saved 
     
