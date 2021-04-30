@@ -14,7 +14,7 @@ from glob import glob
 from tqdm import tqdm
 
 
-def get_keywords_loop_yt(keyword, query):
+def collect_from_yt(keyword, query):
     '''
     Downloads audio from YouTube and searches through audio until enough 
     utterances are collected.
@@ -81,7 +81,7 @@ def get_keywords_loop_yt(keyword, query):
     print(f"Total utterances of '{keyword}': {total_files}")
 
 
-def get_keywords_loop_local(keyword, data_dir):
+def collect_from_local(keyword, data_dir):
     '''
     Searches through local wav files for utterancs. Does not upload to cloud.
     Compresses files and returns path to zip file containing utterances.
@@ -131,9 +131,9 @@ if __name__ == "__main__":
 
     if FLAGS.keyword is not None:
         if FLAGS.data_dir is None:
-            get_keywords_loop_yt(keyword=FLAGS.keyword, query=FLAGS.query)
+            collect_from_yt(keyword=FLAGS.keyword, query=FLAGS.query)
         else:
-            archive = get_keywords_loop_local(keyword=FLAGS.keyword, 
+            archive = collect_from_local(keyword=FLAGS.keyword, 
                                         data_dir=FLAGS.data_dir)
             print(f"Collected utterances saved to: {archive}")
     else:
