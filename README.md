@@ -11,7 +11,6 @@ It utilizes [Mozilla DeepSpeech](https://github.com/mozilla/DeepSpeech) speech-t
 
 * Extracts and exports keyword utterances from long-form audio
 * Automatically resamples downloaded audio and converts to 1-channel
-* Saves all utterances or only specified keywords.
 * Allows for custom search queries to find relevant audio on YouTube
 
 # Setup
