@@ -1,4 +1,4 @@
-import os 
+import os
 
 import googleapiclient.discovery
 import googleapiclient.errors
@@ -23,7 +23,7 @@ class SearchQuery:
 
 		api_service_name = "youtube"
 		api_version = "v3"
-		API_KEY = os.environ["API_KEY"]
+		API_KEY = os.environ["YT_API_KEY"]
 		
 		youtube = googleapiclient.discovery.build(
 			api_service_name, api_version, developerKey=API_KEY)
@@ -45,7 +45,6 @@ class SearchQuery:
 		for video in videos:
 			self.results["Title"].append(video['snippet']["title"])
 
-			# url = "https://www.youtube.com/watch?v=" + video['id']['videoId']
 			url = video['id']['videoId']
 			self.results["URL"].append(url)
 
@@ -55,10 +54,4 @@ class SearchQuery:
 
 		search_results = self.results["URL"]
 
-		search_results_records = os.path.join(os.getcwd(), f"records/{self.keyword}_searched.txt")
-		searched = open(search_results_records, 'a')
-		for video_id in search_results:
-			searched.write(video_id + "\n")
-		searched.close()
-		
 		return search_results

@@ -1,15 +1,16 @@
 from deepspeech import Model
-
 import soundfile as sf
 import numpy as np
-from gcp import gcp_bkt
 
-import os 
+import os
 import wave
 
 
 def read_wav_file(filename):
-    ''' Must be already resampled (16kHz, mono) '''
+    ''' 
+    Reads frame rate, number of frames, and buffer from WAV file.
+    Must be already resampled (16kHz, mono) 
+    '''
     with wave.open(filename, 'rb') as w:
         rate = w.getframerate()
         frames = w.getnframes()
@@ -21,6 +22,9 @@ def read_wav_file(filename):
     
 
 def get_model():
+    '''
+    Load DeepSpeech speech-to-text model.
+    '''
     model_file_path = "models/deepspeech-0.9.3-models.pbmm"
     lm_file_path = "models/deepspeech-0.9.3-models.scorer"
 
@@ -63,34 +67,32 @@ def extract_keywords(metadata):
     return transcript
 
 
-def save_keywords(transcript, keyword, audio, auth):
+def save_keywords(transcript, keyword, audio):
     ''' Save utterances in individual .wav files '''
 
-    kw_dir = os.path.join("data", keyword)
+    # create directory to store keywords if it doesn't exist
+    if not os.path.exists(keyword):
+        os.makedirs(keyword)
     
     sample_rate = 16000
 
-    key = len(os.listdir(kw_dir))
-
+    num_total = len(os.listdir(keyword))
     saved = 0
-    for i, entry in enumerate(transcript):
+
+    for entry in transcript:
         word = entry[0] # keyword
-        
-        # save only desired keyword 
-        if word == keyword:    
-            # get start and end times 
+
+        # save only desired keyword
+        if word == keyword:
+            # get start and end times
             start = int(entry[1] * sample_rate)
             end = int(entry[2] * sample_rate)
 
-            # save wav file 
-            save_file = f"{word}_{i+key}.wav"
-            out_file_path = os.path.join(kw_dir, save_file)
+            # save wav file
+            save_file = f"{word}_{num_total+saved}.wav"
+            out_file_path = os.path.join(keyword, save_file)
             sf.write(out_file_path, audio[start:end], sample_rate)
 
-            if auth is True:
-                # upload to google storage bucket
-                gcp_bkt.upload_clip(keyword=keyword, wav=out_file_path)
-            
             saved += 1
 
     return saved
@@ -101,7 +103,7 @@ def inspect_keywords(transcript):
 
     words = []
 
-    for i, entry in enumerate(transcript):
+    for entry in transcript:
         word = entry[0] # keyword
         words.append(word)
 
@@ -114,17 +116,17 @@ def inspect_keywords(transcript):
     return sorted_counts
 
 
-def extract(conv_audio, keyword, auth):
+def extract(filename, keyword):
     '''
     Extracts keywords from audio file,
 
-    conv_audio: Path to resampled audio file 
+    filename:   Path to resampled audio file 
     keyword:    Desired keyword to collect
-    auth:       True if saving to GCP cloud storage bucket 
     '''
-    print(f"Extracting '{keyword}' utterances from {conv_audio}.")
+    print(f"Extracting '{keyword}' utterances from {filename}.")
+    
     # time series, number of samples, sampling rate 
-    audio, buffer, rate = read_wav_file(conv_audio)
+    audio, buffer, rate = read_wav_file(filename)
 
     # tokens 
     transcribed_metadata = transcribe_batch(audio=audio)
@@ -133,7 +135,7 @@ def extract(conv_audio, keyword, auth):
     transcript = extract_keywords(transcribed_metadata)
 
     num_saved = save_keywords(transcript=transcript, keyword=keyword, 
-                            audio=audio, auth=auth)
+                            audio=audio)
 
     print(f"Utterances saved: {num_saved}")
 

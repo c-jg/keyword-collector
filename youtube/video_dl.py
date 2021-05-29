@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 import youtube_dl
-import os 
 
 
 class MyLogger(object):
@@ -15,7 +14,6 @@ class MyLogger(object):
 
 
 def download_audio(video_id):
-    SAVE_PATH = "data"
     video = "https://www.youtube.com/watch?v=" + video_id
 
     ydl_opts = {
@@ -27,13 +25,12 @@ def download_audio(video_id):
             'preferredquality': '192',
         }],
         'logger': MyLogger(),
-        'outtmpl': SAVE_PATH + '/vid_%(id)s.%(ext)s'
+        'outtmpl': 'vid_%(id)s.%(ext)s'
     }
 
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info_dict = ydl.extract_info(video, download=False)
         id_ = info_dict.get("id", None)
-        title = info_dict.get("title", None)
         ydl.download([video])
     
-    return os.path.join(SAVE_PATH, f"vid_{id_}.wav")
+    return f"vid_{id_}.wav"
